@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class CouponSuspension extends Model
+{
+    //
+    protected $fillable = ['coupon_id', 'user_id', 'reason', 'suspended_at', 'lifted_at'];
+
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
