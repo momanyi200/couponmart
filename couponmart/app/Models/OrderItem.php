@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class OrderItem extends Model
 {
     //
-    protected $fillable=['user_id','order_id','coupon_id','quantity','price','seller_earning','system_cut'];
+    protected $fillable=['user_id','order_id','coupon_id','quantity','price','seller_earning','system_cut','cashback_amount'];
 
     public function coupon()
     {

@@ -122,14 +122,14 @@ class OrderController extends Controller
         return $pdf->download($fileName);
     }
  
-     
+       
+
     public function redeem(Order $order)
     {
         if ($order->status === 'redeemed') {
             return back()->with('info', 'Order has already been redeemed.');
         }
 
-        // Wrap everything in a transaction
         DB::beginTransaction();
 
         try {
@@ -159,7 +159,6 @@ class OrderController extends Controller
                 'description' => "Payment for Order #{$order->order_number}",
             ]);
 
-
             // -------------------------------
             // 2. SYSTEM WALLET
             //-------------------------------
@@ -171,71 +170,78 @@ class OrderController extends Controller
                 ]);
             }
 
+            $totalCashback = 0;
 
             // -------------------------------
             // 3. LOOP ITEMS: SELLER PAYOUTS + REDUCE COUPON STOCK
             // -------------------------------
             foreach ($order->items as $item) {
 
-                // Calculate earning breakdown
                 $sellerEarning = $item->seller_earning ?? ($item->price * 0.90);
                 $systemCut     = $item->system_cut ?? ($item->price * 0.10);
 
-                // ---------------------------------
-                // 3A. Fetch Seller (coupon → business → user)
-                // ---------------------------------
+                // Seller payout
                 $seller = $item->coupon->business->user ?? null;
-
                 if ($seller) {
                     $sellerWallet = $seller->wallet ?? Wallet::create([
                         'user_id' => $seller->id,
                         'balance' => 0,
                     ]);
 
-                    // Pay seller
                     $sellerWallet->balance += $sellerEarning;
                     $sellerWallet->save();
 
-                    // Log seller transaction
                     WalletTransaction::create([
-                        'wallet_id'   => $sellerWallet->id,
-                        'amount'      => $sellerEarning,
-                        'type'        => 'seller_earning',
+                        'wallet_id' => $sellerWallet->id,
+                        'amount' => $sellerEarning,
+                        'type' => 'seller_earning',
                         'reference' => "Earning from Order #{$order->order_number}, Item #{$item->id}",
                         'status' => 'paid',
                     ]);
                 }
 
-                // ---------------------------------
-                // 3B. System Commission
-                // ---------------------------------
+                // System commission
                 $systemWallet->balance += $systemCut;
                 $systemWallet->save();
 
                 WalletTransaction::create([
-                    'wallet_id'   => $systemWallet->id,
-                    'amount'      => $systemCut,
-                    'type'        => 'system_commission',
+                    'wallet_id' => $systemWallet->id,
+                    'amount' => $systemCut,
+                    'type' => 'system_commission',
                     'reference' => "System commission from Order #{$order->order_number}, Item #{$item->id}",
-                    'status'  => 'paid',
+                    'status' => 'paid',
                 ]);
 
-
-                // ---------------------------------
-                // 3C. Reduce Coupon Quantity
-                // ---------------------------------
+                // Reduce coupon stock
                 $coupon = $item->coupon;
-
                 if ($coupon) {
-                    // Reduce based on quantity purchased
                     $coupon->remaining_vouchers = max(0, $coupon->remaining_vouchers - $item->quantity);
                     $coupon->save();
                 }
+
+                // -------------------------------
+                // 3D. CALCULATE CASHBACK PER ITEM
+                // -------------------------------
+                $cashbackAmount = $item->cashback_amount ?? 0;
+                $totalCashback += $cashbackAmount;
             }
 
+            // -------------------------------
+            // 4. CREDIT CASHBACK TO CUSTOMER WALLET
+            // -------------------------------
+            if ($totalCashback > 0) {
+                WalletTransaction::create([
+                    'wallet_id' => $customerWallet->id,
+                    'amount' => $totalCashback,
+                    'type' => 'cashback',
+                    'description' => "Cashback from redeemed Order #{$order->order_number}",
+                ]);
+
+                $customerWallet->increment('balance', $totalCashback);
+            }
 
             // -------------------------------
-            // 4. UPDATE ORDER
+            // 5. UPDATE ORDER
             // -------------------------------
             $order->update([
                 'status'        => 'redeemed',
@@ -246,12 +252,7 @@ class OrderController extends Controller
                 'paid_amount'     => $order->total,
             ]);
 
-
-            // -------------------------------
-            // 5. COMMIT TRANSACTION
-            // -------------------------------
             DB::commit();
-
 
             // -------------------------------
             // 6. SEND EMAIL (optional)
@@ -261,16 +262,12 @@ class OrderController extends Controller
                     ->send(new \App\Mail\OrderRedeemed($order));
             }
 
-            //return back()->with('success', 'Order redeemed, wallets updated, and coupon stock reduced.');
-             return redirect()
-            ->route('dashboard')
-            ->with('success', 'Order redeemed, wallets updated, and coupon stock reduced.');
-
+            return redirect()
+                ->route('dashboard')
+                ->with('success', 'Order redeemed, wallets updated, coupon stock reduced, and cashback credited.');
 
         } catch (\Throwable $e) {
-
             DB::rollBack();
-
             return back()->with('error', 'Error redeeming order: ' . $e->getMessage());
         }
     }

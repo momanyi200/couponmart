@@ -42,11 +42,13 @@ class SystemChargeController extends Controller
         $request->validate([            
             'cat_id'     => 'required|exists:categories,id|unique:system_charges,cat_id',
             'percentage' => 'required|numeric|min:0|max:100',
+            'cashback_percentage' => 'required|numeric|min:0|max:100',
         ]);
 
         SystemCharge::create([
             'cat_id' => $request->cat_id,
             'percentage' => $request->percentage,
+            'cashback_percentage' => $request->cashback_percentage,
             'added_by' => auth()->id(),
         ]);
 
@@ -85,6 +87,7 @@ class SystemChargeController extends Controller
         $request->validate([            
             'cat_id'     => 'required|exists:categories,id|unique:system_charges,cat_id,' . $id,
             'percentage'  => 'required|numeric|min:0|max:100',
+            'cashback_percentage' => 'required|numeric|min:0|max:100',
         ]);
 
         $charge = SystemCharge::findOrFail($id);
@@ -92,6 +95,7 @@ class SystemChargeController extends Controller
         $charge->update([
             'cat_id' => $request->cat_id,
             'percentage'  => $request->percentage,
+            'cashback_percentage' => $request->cashback_percentage,
             'addedby'     => auth()->id(),   // Update the user who made the change
         ]);
 

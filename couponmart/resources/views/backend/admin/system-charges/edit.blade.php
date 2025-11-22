@@ -28,6 +28,16 @@
                    class="w-full border rounded p-2">
         </div>
 
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Cashback Percentage (%)</label>
+            <input type="text" name="cashback_percentage"
+                   class="w-full border rounded p-2"
+                   value="{{ old('cashback_percentage', $charge->cashback_percentage) }}">
+            @error('cashback_percentage')
+                <p class="text-red-500 text-sm">{{ $message }}</p>
+            @enderror
+        </div>
+
         <button class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">
             Update Charge
         </button>

@@ -1,68 +1,67 @@
 @php 
-    $role=Auth::user()->getRoleNames()->first();    
-@endphp 
+    $role = Auth::user()->getRoleNames()->first();
+    $active = 'bg-blue-600 text-white';
+    $inactive = 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-100';
+
+    // List all menu items once for both dropdown & desktop
+    $menuItems = [
+        ['name' => 'Running', 'route' => 'admin.coupons.index'],
+        ['name' => 'Being Reviewed', 'route' => 'koupsunderreview'],
+        ['name' => 'Pending', 'route' => 'admin.pendingcoupons'],
+        ['name' => 'Suspend', 'route' => 'admin.coupons.suspended', 'params' => ['status'=>'me']],
+        ['name' => 'Matured', 'route' => 'admin.coupons.matured_expired'],
+    ];
+@endphp
+
 <div class="container mx-auto">
-    <ul class="flex justify-end space-x-2">
-        <li>
-            <a href="{{ route('admin.coupons.index') }}"
-               class="px-4 py-2 rounded-lg text-sm font-medium
-               {{ \Request::route()->getName() === 'admin.coupons.index' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-100' }}">
-                Running
-            </a>
-        </li>
 
-        <li>
-            <a href="{{ route('koupsunderreview') }}"
-               class="px-4 py-2 rounded-lg text-sm font-medium
-               {{ \Request::route()->getName() === 'koupsunderreview' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-100' }}">
-                Being Reviewed
-            </a>
-        </li>
+    <!-- MOBILE DROPDOWN (hidden on md+) -->
+    <div class="block md:hidden mb-4">
+        <select 
+            class="w-full p-2 border rounded-lg"
+            onchange="if (this.value) window.location.href = this.value;">
+            
+            @foreach ($menuItems as $item)
+                <option 
+                    value="{{ route($item['route'], $item['params'] ?? []) }}"
+                    {{ request()->routeIs($item['route']) ? 'selected' : '' }}>
+                    {{ $item['name'] }}
+                </option>
+            @endforeach
 
-        <li>
-            <a href="{{ route('admin.pendingcoupons') }}"
-               class="px-4 py-2 rounded-lg text-sm font-medium
-               {{ \Request::route()->getName() === 'admin.pendingcoupons' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-100' }}">
-                Pending
-            </a>
-        </li>
+            @if($role == 'business')
+                <option value="{{ route('admin.coupons.create') }}"
+                    {{ request()->routeIs('admin.coupons.create') ? 'selected' : '' }}>
+                    Add Coupon
+                </option>
+            @endif
+        </select>
+    </div>
 
-        <li>
-            <a href="{{ route('admin.coupons.suspended', ['status'=>'me']) }}"
-               class="px-4 py-2 rounded-lg text-sm font-medium
-               {{ \Request::route()->getName() === 'admin.coupons.suspended' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-100' }}">
-                Suspend
-            </a>
-        </li>
+    <!-- DESKTOP MENU (hidden on small screens) -->
+    <ul class="hidden md:flex justify-end space-x-2">
 
-        <li>
-            <a href="{{ route('admin.coupons.matured_expired') }}"
-               class="px-4 py-2 rounded-lg text-sm font-medium
-               {{ \Request::route()->getName() === 'bussexpiredcoup' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-100' }}">
-                Matured
-            </a>
-        </li>
-        @if($role=='business')
+        @foreach ($menuItems as $item)
+            <li>
+                <a href="{{ route($item['route'], $item['params'] ?? []) }}"
+                   class="px-4 py-2 rounded-lg text-sm font-medium
+                        {{ request()->routeIs($item['route']) ? $active : $inactive }}">
+                    {{ $item['name'] }}
+                </a>
+            </li>
+        @endforeach
+
+        @if($role == 'business')
         <li>
             <a href="{{ route('admin.coupons.create') }}"
                 class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                {{ \Request::route()->getName() === 'admin.coupons.create' 
-                        ? 'bg-green-600 text-white shadow-lg shadow-green-300/40 scale-105' 
-                        : 'bg-green-500 text-white hover:bg-green-600 hover:shadow-lg hover:shadow-blue-300/40' }}">
-                    Add Coupon
+                {{ request()->routeIs('admin.coupons.create') 
+                    ? 'bg-green-600 text-white shadow-lg shadow-green-300/40 scale-105' 
+                    : 'bg-green-500 text-white hover:bg-green-600 hover:shadow-lg hover:shadow-green-300/40' }}">
+                Add Coupon
             </a>
-
         </li>
         @endif
     </ul>
+
 </div>

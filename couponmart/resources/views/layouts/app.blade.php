@@ -19,77 +19,124 @@
 <body class="bg-gray-100 text-gray-900">
 
     <!-- Navbar -->
-    <nav class="bg-white shadow">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="{{ url('/') }}" class="text-xl font-bold text-blue-600">CouponSeller</a>
+<nav class="bg-white shadow" x-data="{ mobileMenu: false, open: false }">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
 
-            <div class="flex items-center space-x-6">
-                <a href="{{ route('home') }}" class="text-gray-700 hover:text-blue-600 font-medium">Home</a>
-                <a href="{{ route('coupons.index') }}" class="text-gray-700 hover:text-blue-600 font-medium">Coupons</a>
-                <a href="{{ route('business.index') }}" class="text-gray-700 hover:text-blue-600 font-medium">Business</a>    
+        <!-- Logo -->
+        <a href="{{ url('/') }}" class="text-xl font-bold text-blue-600">
+            CouponSeller
+        </a>
 
-                <span class="text-gray-300">|</span> 
+        <!-- Mobile Menu Button -->
+        <button @click="mobileMenu = !mobileMenu" class="md:hidden text-gray-600 focus:outline-none">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </button>
 
-                @guest 
-                    <a href="{{ route('login') }}" 
-                        class="px-4 py-1 border border-blue-600 text-blue-600 rounded hover:bg-blue-600 hover:text-white transition-colors duration-200">
-                        Login
-                    </a>
-                @else
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center space-x-6">
+            <a href="{{ route('home') }}" class="text-gray-700 hover:text-blue-600 font-medium">Home</a>
+            <a href="{{ route('coupons.index') }}" class="text-gray-700 hover:text-blue-600 font-medium">Coupons</a>
+            <a href="{{ route('business.index') }}" class="text-gray-700 hover:text-blue-600 font-medium">Business</a>
 
-                        @php
-                            $role = Auth::user()->getRoleNames()->first();
-                            $image = '';
-                            $name = '';
+            <span class="text-gray-300">|</span>
 
-                            if ($role === 'business') {
-                                $imagePath = optional(Auth::user()->business)->image;
-                                $image = $imagePath ? 'assets/business/' . $imagePath : '';
-                                $name = optional(Auth::user()->business)->business_name ?? 'Business User';
-                            }
+            @guest
+                <a href="{{ route('login') }}"
+                    class="px-4 py-1 border border-blue-600 text-blue-600 rounded hover:bg-blue-600 hover:text-white transition">
+                    Login
+                </a>
+            @else
 
-                            if ($role === 'customer') {
-                                $imagePath = optional(Auth::user()->profile)->image;
-                                $image = $imagePath ? 'assets/users/' . $imagePath : '';
-                                $name = optional(Auth::user()->profile)->first_name ?? 'Customer';
-                            }
-                        @endphp
+                @php
+                    $role = Auth::user()->getRoleNames()->first();
+                    $image = '';
+                    $name = '';
 
-                        <div x-data="{ open: false }" class="relative">
-                            {{-- Profile Photo Button --}}
-                            <button @click="open = !open" :aria-expanded="open.toString()" class="flex items-center space-x-2 focus:outline-none">
-                                <img src="{{ $image && file_exists(public_path($image)) ? asset($image) : asset('images/default-avatar.png') }}" 
-                                    alt="Profile" 
-                                    class="w-8 h-8 rounded-full object-cover border border-gray-300">
-                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                </svg>
-                                <span>{{ $name }}</span>
+                    if ($role === 'business') {
+                        $imagePath = optional(Auth::user()->business)->image;
+                        $image = $imagePath ? 'assets/business/'.$imagePath : '';
+                        $name = optional(Auth::user()->business)->business_name ?? 'Business User';
+                    }
+
+                    if ($role === 'customer') {
+                        $imagePath = optional(Auth::user()->profile)->image;
+                        $image = $imagePath ? 'assets/users/'.$imagePath : '';
+                        $name = optional(Auth::user()->profile)->first_name ?? 'Customer';
+                    }
+                @endphp
+
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
+                        <img src="{{ $image && file_exists(public_path($image)) ? asset($image) : asset('images/default-avatar.png') }}"
+                            class="w-8 h-8 rounded-full object-cover border"/>
+
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor"
+                             stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+
+                        <span>{{ $name }}</span>
+                    </button>
+
+                    <div x-show="open" @click.outside="open = false" x-transition
+                        class="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg z-50">
+                        <a href="{{ route('dashboard') }}"
+                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
+                            Dashboard
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                Logout
                             </button>
+                        </form>
+                    </div>
+                </div>
+            @endguest
+        </div>
+    </div>
 
-                            {{-- Dropdown Menu --}}
-                            <div x-show="open" @click.outside="open = false" x-transition
-                                class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-50">
-                                <a href="{{ route('dashboard') }}" 
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50">
-                                    Dashboard
-                                </a>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" 
-                                        class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                        Logout
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
+    <!-- Mobile Menu -->
+    <div x-show="mobileMenu" x-transition class="md:hidden bg-white border-t">
+        <a href="{{ route('home') }}"
+           class="block px-4 py-3 text-gray-700 hover:bg-blue-50">Home</a>
+        <a href="{{ route('coupons.index') }}"
+           class="block px-4 py-3 text-gray-700 hover:bg-blue-50">Coupons</a>
+        <a href="{{ route('business.index') }}"
+           class="block px-4 py-3 text-gray-700 hover:bg-blue-50">Business</a>
 
-
-                @endguest
+        @guest
+            <a href="{{ route('login') }}"
+               class="block mx-4 my-2 text-center px-4 py-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-600 hover:text-white">
+               Login
+            </a>
+        @else
+            <div class="px-4 py-3 border-t flex items-center space-x-3">
+                <img src="{{ $image && file_exists(public_path($image)) ? asset($image) : asset('images/default-avatar.png') }}"
+                    class="w-10 h-10 rounded-full border object-cover"/>
+                <span class="font-medium">{{ $name }}</span>
             </div>
 
-        </div>
-    </nav>
+            <a href="{{ route('dashboard') }}"
+               class="block px-4 py-3 text-gray-700 hover:bg-blue-50">
+               Dashboard
+            </a>
+
+            <form method="POST" action="{{ route('logout') }}" class="border-t">
+                @csrf
+                <button class="block w-full text-left px-4 py-3 text-red-600 hover:bg-red-50">
+                    Logout
+                </button>
+            </form>
+        @endguest
+    </div>
+</nav>
+
+
 
     <!-- Flash messages -->
     @if (session('success'))

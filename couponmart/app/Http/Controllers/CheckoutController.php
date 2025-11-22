@@ -46,10 +46,12 @@ class CheckoutController extends Controller
             foreach ($items as $item) {
                
                 $charge = $item->coupon->systemCharge();
+                $cashbackPercentage = $charge->cashback_percentage ?? 0;
                 $percentage = $charge->percentage ?? 0;
                 $price = $item->price * $item->quantity;
                 $systemCut = ($percentage / 100) * $price;
                 $sellerEarning = $price - $systemCut;
+                $cashbackAmount = ($systemCut * $cashbackPercentage) / 100;
 
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -58,6 +60,7 @@ class CheckoutController extends Controller
                     'price'    => $item->price,
                     'system_cut'     => $systemCut,
                     'seller_earning' => $sellerEarning,
+                    'cashback_amount' => $cashbackAmount,
                 ]);
             }
 

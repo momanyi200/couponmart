@@ -33,7 +33,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/register', [RegisteredUserController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisteredUserController::class, 'register'])->name('register.store');
 
-
+ 
 Route::middleware(['auth', 'role:customer'])->group(function () {
     
      Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -76,7 +76,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('admin/system-charges',[SystemChargeController::class, 'store'])->name('system-charges.store');
 
     Route::get('admin/system-charges/edit/{id}',[SystemChargeController::class, 'create'])->name('system-charges.create');
-    Route::post('admin/system-charges/update',[SystemChargeController::class, 'update'])->name('system-charges.update');
+    //Route::post('admin/system-charges/update',[SystemChargeController::class, 'update'])->name('system-charges.update');
+    Route::put('admin/system-charges/{id}', [SystemChargeController::class, 'update'])->name('system-charges.update');
+
 
     Route::delete('admin/system-charges/{id}', [SystemChargeController::class, 'destroy'])->name('system-charges.destroy');
 

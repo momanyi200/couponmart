@@ -16,24 +16,47 @@
         </div>
     </section>
 
-    <section id="intro" class="container mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach([
-                ['icon' => 'bx-checkbox-checked', 'title' => 'Quality Products'],
-                ['icon' => 'bx-money', 'title' => 'Cash Back'],
-                ['icon' => 'bx-phone-call', 'title' => '24/7 Support'],
-            ] as $intro)
-                <div class="bg-white rounded-lg shadow-md text-center p-6 hover:shadow-lg transition duration-300">
-                    <div class="mb-4">
-                        <i class="bx {{ $intro['icon'] }} text-white text-3xl rounded-full p-4" style="background-color: #000;"></i>
+    <section id="intro" class="w-full px-0 py-0">
+    <div class="grid grid-cols-3 sm:gap-0 lg:gap-6 py-6">
+        @foreach([
+            ['icon' => 'bx-checkbox-checked', 'title' => 'Quality Products'],
+            ['icon' => 'bx-money', 'title' => 'Cash Back'],
+            ['icon' => 'bx-phone-call', 'title' => '24/7 Support'],
+        ] as $intro)
+            <div class="bg-white text-center 
+                p-2 sm:p-4 
+                shadow-sm 
+                border-0 sm:border">
+
+                <div class="mb-1 sm:mb-3">
+                   <div class="mb-1 sm:mb-3 flex justify-center">
+                    <div class="rounded-full bg-black 
+                        w-12 h-12 sm:w-16 sm:h-16 
+                        flex items-center justify-center">
+
+                        <i class="bx {{ $intro['icon'] }} 
+                            text-white 
+                            text-2xl sm:text-4xl">
+                        </i>
+
                     </div>
-                    <h3 class="font-semibold text-lg text-gray-800">
-                        {{ $intro['title'] }}
-                    </h3>
                 </div>
-            @endforeach
-        </div>
-    </section>
+
+
+                </div>
+
+                <h3 class="font-medium 
+                    text-sm sm:text-base 
+                    text-gray-800">
+                    {{ $intro['title'] }}
+                </h3>
+
+            </div>
+        @endforeach
+    </div>
+</section>
+
+
  
 
     {{-- Categories --}}

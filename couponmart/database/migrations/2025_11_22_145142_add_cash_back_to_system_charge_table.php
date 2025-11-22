@@ -10,12 +10,13 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    { 
-        Schema::table('order_items', function (Blueprint $table) {
+    {
+        Schema::table('system_charges', function (Blueprint $table) {
             //
-            $table->decimal('system_cut', 10, 2)->default(0);
-            $table->decimal('seller_earning', 10, 2)->default(0);
-        });        
+            $table->decimal('cashback_percentage', 5, 2)->default(0)->after('percentage'); 
+
+
+        });
     }
 
     /**
@@ -23,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('order_items', function (Blueprint $table) {
+        Schema::table('system_charge', function (Blueprint $table) {
             //
         });
     }

@@ -10,12 +10,12 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    { 
+    {
         Schema::table('order_items', function (Blueprint $table) {
             //
-            $table->decimal('system_cut', 10, 2)->default(0);
-            $table->decimal('seller_earning', 10, 2)->default(0);
-        });        
+            $table->decimal('cashback_amount', 10, 2)->default(0)->after('seller_earning'); 
+
+        });
     }
 
     /**

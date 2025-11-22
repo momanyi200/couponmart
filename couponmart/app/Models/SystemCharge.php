@@ -9,6 +9,7 @@ class SystemCharge extends Model
     protected $fillable = [
         'cat_id',
         'percentage',
+        'cashback_percentage',
         'added_by',
     ];
 

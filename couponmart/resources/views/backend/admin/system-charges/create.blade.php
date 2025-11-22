@@ -16,17 +16,27 @@
                     <option value="{{ $cat->id }}">{{ $cat->cat_name }}</option>
                 @endforeach
             </select>
-            @error('category_id')
+            @error('cat_id')
                 <p class="text-red-500 text-sm">{{ $message }}</p>
             @enderror
         </div>
 
         <div class="mb-4">
-            <label class="block font-semibold mb-1">Percentage (%)</label>
+            <label class="block font-semibold mb-1">System Fee Percentage (%)</label>
             <input type="text" name="percentage"
                    class="w-full border rounded p-2"
                    placeholder="e.g. 5">
             @error('percentage')
+                <p class="text-red-500 text-sm">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Cashback Percentage (%)</label>
+            <input type="text" name="cashback_percentage"
+                   class="w-full border rounded p-2"
+                   placeholder="e.g. 2">
+            @error('cashback_percentage')
                 <p class="text-red-500 text-sm">{{ $message }}</p>
             @enderror
         </div>

@@ -8,7 +8,7 @@
         <a href="{{ route('system-charges.create') }}"
            class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">
             + Add Charge
-        </a>
+        </a> 
     </div>
 
     @if(session('success'))
@@ -17,48 +17,33 @@
         </div>
     @endif
 
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <table class="w-full text-left border-collapse">
-            <thead class="bg-gray-100 border-b">
-                <tr>
-                    <th class="p-3">Category</th>
-                    <th class="p-3">Percentage</th>
-                    <th class="p-3">Added By</th>
-                    <th class="p-3">Created</th>
-                    <th class="p-3 text-right">Actions</th>
-                </tr>
-            </thead>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach ($charges as $charge)
+            <div class="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-200">
+                <h2 class="text-lg font-bold mb-2">{{ $charge->category->cat_name }}</h2>
+                <p><span class="font-semibold">System Fee:</span> {{ $charge->percentage }}%</p>
+                <p><span class="font-semibold">Cashback:</span> {{ $charge->cashback_percentage }}%</p>
+                <p><span class="font-semibold">Added By:</span> {{ $charge->user->name ?? 'N/A' }}</p>
 
-            <tbody>
-                @foreach ($charges as $charge)
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="p-3">{{ $charge->category->cat_name }}</td>
-                        <td class="p-3">{{ $charge->percentage }}%</td>
-                        <td class="p-3">{{ $charge->user->name ?? 'N/A' }}</td>
-                        <td class="p-3">{{ $charge->created_at->format('d M Y') }}</td>
+                <div class="mt-4 flex justify-between items-center">
+                    <a href="{{ route('system-charges.edit', $charge->id) }}"
+                       class="text-blue-600 hover:underline">Edit</a>
 
-                        <td class="p-3 text-right">
-                            <a href="{{ route('system-charges.edit', $charge->id) }}"
-                               class="text-blue-600 hover:underline mr-3">Edit</a>
-
-                            <form method="POST"
-                                  action="{{ route('system-charges.destroy', $charge->id) }}"
-                                  class="inline-block"
-                                  onsubmit="return confirm('Delete this charge?')">
-                                @csrf
-                                @method('DELETE')
-                                <button class="text-red-600 hover:underline">Delete</button>
-                            </form>
-                        </td>
-
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+                    <form method="POST"
+                          action="{{ route('system-charges.destroy', $charge->id) }}"
+                          onsubmit="return confirm('Delete this charge?')">
+                        @csrf
+                        @method('DELETE')
+                        <button class="text-red-600 hover:underline">Delete</button>
+                    </form>
+                </div>
+            </div>
+        @endforeach
     </div>
 
-    <div class="mt-4">
+    <div class="mt-6">
         {{ $charges->links() }}
     </div>
+
 </div>
 @endsection
