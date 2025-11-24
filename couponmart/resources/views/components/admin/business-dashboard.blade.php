@@ -3,12 +3,12 @@
     $business = $user->business;
     $image = $business && $business->image ? 'assets/business/' . $business->image : null;
     $name = $business->business_name ?? 'Your Business';
-@endphp
+@endphp 
 
 <div class="p-4 bg-white text-start overflow-auto w-full md:w-64 rounded shadow">
     <!-- Profile Header -->
     <div class="mb-6 text-center">
-        @if($image && file_exists(public_path($image)))
+        @if($image && file_exists($image))
             <img src="{{ url($image) }}" class="mx-auto w-24 h-24 rounded-full border shadow object-cover" alt="Profile Picture" />
         @else
             <div class="mx-auto w-24 h-24 flex items-center justify-center rounded-full border bg-gray-100 text-gray-500 text-4xl shadow">
@@ -38,6 +38,7 @@
             ['route'=>'order.check', 'title'=>'QR Scanner'],
             ['route'=>'myinterest', 'title'=>'My Interests/Categories'],
             ['route'=>'physicalLocation', 'title'=>'Physical Location'],
+            ['route'=>'messages.index', 'title'=>'Messages'],
         ] as $sidebar)
             <a href="{{ route($sidebar['route']) }}" 
                class="px-3 py-2 rounded hover:bg-gray-100 text-gray-700 text-sm">

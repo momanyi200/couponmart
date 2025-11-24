@@ -30,8 +30,10 @@
                md:translate-x-0" 
         :class="{ '-translate-x-full': !sidebar }">
 
-        <div class="p-4 text-lg font-bold border-b border-gray-700">
-            Couponmart
+        <div class="p-4 text-lg font-bold border-b border-gray-700"> 
+            <a href="{{ url('/') }}" class="text-xl font-bold text-blue-600">
+                Couponmart
+            </a>
         </div>
 
         <nav class="mt-4">
@@ -86,7 +88,11 @@
                     <i class='bx bx-menu text-2xl'></i>
                 </button>
 
-                <h1 class="text-xl font-bold">@yield('heading', 'Couponmart')</h1>
+                <h1 class="text-xl font-bold">
+                    <a href="{{ url('/') }}" class="text-xl font-bold text-blue-600">
+                        @yield('heading', 'Couponmart')
+                    </a>
+                </h1>
             </div>
 
             <!-- Right menu -->

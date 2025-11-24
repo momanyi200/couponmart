@@ -4,7 +4,7 @@
     $image = "";
     $name = "admin";
     $user = App\Models\User::find($user_id);
-@endphp
+@endphp 
 
 <div class="w-56 p-5 bg-white text-left shadow-md rounded-lg">
     <div class="mb-6 text-left"> 
@@ -42,6 +42,10 @@
         </a>
         <a href="{{ route('orders.index')}}" class="block px-3 py-2 rounded-md hover:bg-gray-100">
             Orders
+        </a>
+
+         <a href="{{ route('messages.index')}}" class="block px-3 py-2 rounded-md hover:bg-gray-100">
+            Messages
         </a>
     </nav>
 

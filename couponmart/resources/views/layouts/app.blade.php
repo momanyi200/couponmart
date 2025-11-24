@@ -35,6 +35,26 @@
                     d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
         </button>
+        
+        @php
+            $user = Auth::user();
+            $role = $user ? $user->getRoleNames()->first() : null;
+            $image = '';
+            $name = '';
+
+            if ($role === 'business') {
+                $imagePath = optional($user->business)->image;
+                $image = $imagePath ? 'assets/business/'.$imagePath : '';
+                $name = optional($user->business)->business_name ?? 'Business User';
+            }
+
+            if ($role === 'customer') {
+                $imagePath = optional($user->profile)->image;
+                $image = $imagePath ? 'assets/users/'.$imagePath : '';
+                $name = optional($user->profile)->first_name ?? 'Customer';
+            }
+        @endphp
+
 
         <!-- Desktop Menu -->
         <div class="hidden md:flex items-center space-x-6">
@@ -42,6 +62,9 @@
             <a href="{{ route('coupons.index') }}" class="text-gray-700 hover:text-blue-600 font-medium">Coupons</a>
             <a href="{{ route('business.index') }}" class="text-gray-700 hover:text-blue-600 font-medium">Business</a>
 
+            @if($role === 'customer')
+                <a href="{{ route('cart.index') }}" class="text-gray-700 hover:text-blue-600 font-medium">Cart</a>
+            @endif
             <span class="text-gray-300">|</span>
 
             @guest
@@ -51,27 +74,11 @@
                 </a>
             @else
 
-                @php
-                    $role = Auth::user()->getRoleNames()->first();
-                    $image = '';
-                    $name = '';
-
-                    if ($role === 'business') {
-                        $imagePath = optional(Auth::user()->business)->image;
-                        $image = $imagePath ? 'assets/business/'.$imagePath : '';
-                        $name = optional(Auth::user()->business)->business_name ?? 'Business User';
-                    }
-
-                    if ($role === 'customer') {
-                        $imagePath = optional(Auth::user()->profile)->image;
-                        $image = $imagePath ? 'assets/users/'.$imagePath : '';
-                        $name = optional(Auth::user()->profile)->first_name ?? 'Customer';
-                    }
-                @endphp
+               
 
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
-                        <img src="{{ $image && file_exists(public_path($image)) ? asset($image) : asset('images/default-avatar.png') }}"
+                        <img src="{{ $image && file_exists($image) ? asset($image) : asset('images/default-avatar.png') }}"
                             class="w-8 h-8 rounded-full object-cover border"/>
 
                         <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor"

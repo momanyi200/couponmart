@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Business; 
+use App\Models\Conversation;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -65,6 +66,18 @@ class User extends Authenticatable
     {
         return $this->wallet->balance ?? 0;
     }
+
+    public function conversations()
+    {
+        // assuming you are using a pivot table conversation_participants
+        return $this->belongsToMany(
+            Conversation::class, 
+            'conversation_participants', 
+            'user_id', 
+            'conversation_id'
+        )->withTimestamps();
+    }
+
     
 
 }

@@ -18,11 +18,34 @@ class WalletController extends Controller
         $this->walletService = $walletService;
     }
 
-    public function index() { 
+   
+    public function index(Request $request)
+    {
         $wallet = auth()->user()->wallet;
-        $transactions = $wallet ? $wallet->transactions()->latest()->get() : collect();
+
+        // Default empty collection if no wallet yet
+        if (!$wallet) {
+            $transactions = collect();
+            return view('backend.wallet.index', compact('wallet', 'transactions'));
+        }
+
+        $transactions = $wallet->transactions()
+            ->when($request->search, function ($q) use ($request) {
+                $q->where('reference', 'LIKE', "%{$request->search}%");
+            })
+            ->when($request->type, function ($q) use ($request) {
+                $q->where('type', $request->type);
+            })
+            ->when($request->status, function ($q) use ($request) {
+                $q->where('status', $request->status);
+            })
+            ->latest()
+            ->paginate(10)           // Enable pagination
+            ->withQueryString();      // Keep filters when navigating pages
+
         return view('backend.wallet.index', compact('wallet', 'transactions'));
     }
+
 
     public function deposit(Request $request) {
         $request->validate(['amount' => 'required|numeric|min:1']);

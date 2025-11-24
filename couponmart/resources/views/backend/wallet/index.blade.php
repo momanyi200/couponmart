@@ -4,7 +4,7 @@
 
 @php 
     $role=Auth::user()->getRoleNames()->first();    
-@endphp 
+@endphp  
 
 <div class="max-w-6xl mx-auto px-4 py-8 space-y-8">
 
@@ -59,6 +59,41 @@
     <div class="bg-white shadow-md rounded-lg p-6">
         <h3 class="text-xl font-semibold mb-4">Transactions</h3>
 
+        <!-- Filters -->
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+
+            <input type="text" name="reference" placeholder="Search reference"
+                value="{{ request('reference') }}"
+                class="border rounded-lg px-3 py-2">
+
+            <select name="type" class="border rounded-lg px-3 py-2">
+                <option value="">All Types</option>
+                <option value="deposit" {{ request('type')=='deposit'?'selected':'' }}>Deposit</option>
+                <option value="withdrawal" {{ request('type')=='withdrawal'?'selected':'' }}>Withdrawal</option>
+            </select>
+
+            <select name="status" class="border rounded-lg px-3 py-2">
+                <option value="">All Status</option>
+                <option value="completed" {{ request('status')=='completed'?'selected':'' }}>Completed</option>
+                <option value="pending" {{ request('status')=='pending'?'selected':'' }}>Pending</option>
+                <option value="failed" {{ request('status')=='failed'?'selected':'' }}>Failed</option>
+            </select>
+
+            <input type="date" name="start_date"
+                value="{{ request('start_date') }}"
+                class="border rounded-lg px-3 py-2">
+
+            <input type="date" name="end_date"
+                value="{{ request('end_date') }}"
+                class="border rounded-lg px-3 py-2">
+
+            <button class="md:col-span-5 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                Apply Filters
+            </button>
+
+        </form>
+
+        <!-- Transactions List -->
         <div class="space-y-4">
 
             @forelse($transactions as $tx)
@@ -92,11 +127,17 @@
 
                 </div>
             @empty
-                <p class="text-gray-500">No transactions yet.</p>
+                <p class="text-gray-500">No transactions found.</p>
             @endforelse
 
         </div>
+
+        <!-- Pagination -->
+        <div class="mt-6">
+            {{ $transactions->links() }}
+        </div>
     </div>
+
 
 </div>
 

@@ -16,6 +16,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SystemChargeController;
 use App\Http\Controllers\OrderLookupController;
 use App\Http\Controllers\WalletController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ConversationController;
 
 
 Route::get('/', [PagesController::class, 'index'])->name('home');
@@ -75,9 +77,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     
     Route::post('admin/system-charges',[SystemChargeController::class, 'store'])->name('system-charges.store');
 
-    Route::get('admin/system-charges/edit/{id}',[SystemChargeController::class, 'create'])->name('system-charges.create');
+    //Route::get('admin/system-charges/edit/{id}',[SystemChargeController::class, 'create'])->name('system-charges.create');
     //Route::post('admin/system-charges/update',[SystemChargeController::class, 'update'])->name('system-charges.update');
-    Route::put('admin/system-charges/{id}', [SystemChargeController::class, 'update'])->name('system-charges.update');
+    //Route::put('admin/system-charges/{id}', [SystemChargeController::class, 'update'])->name('admin.system-charges.update');
 
 
     Route::delete('admin/system-charges/{id}', [SystemChargeController::class, 'destroy'])->name('system-charges.destroy');
@@ -188,6 +190,23 @@ Route::middleware(['auth', 'role:admin|business|customer'])->group(function () {
     Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
     Route::post('/wallet/deposit', [WalletController::class, 'deposit'])->name('wallet.deposit');
     Route::post('/wallet/withdraw', [WalletController::class, 'withdraw'])->name('wallet.withdraw');
+
+    Route::get('/messages', [App\Http\Controllers\ConversationController::class, 'index'])->name('messages.index');
+    Route::get('/conversations/{conversation}', [App\Http\Controllers\ConversationController::class, 'show'])
+        ->middleware('can:access,conversation')
+        ->name('conversations.show');
+
+    Route::post('/conversations/{conversation}/messages', [App\Http\Controllers\MessageController::class, 'store'])
+        ->middleware('can:access,conversation')
+        ->name('conversations.messages.store');
+
+    // Start admin conversation (user -> admin)
+    Route::post('/conversations/admin/start', [App\Http\Controllers\ConversationController::class, 'startAdminConversation'])
+        ->name('conversations.admin.start');
+
+    // Optional: create conversation for an order (if you create it on order placement in code, no route needed)
+    Route::post('/orders/{order}/conversation', [App\Http\Controllers\ConversationController::class, 'createForOrder'])
+        ->name('conversations.createForOrder');
 
     
 
