@@ -126,8 +126,26 @@
                             $image = $imagePath ? 'assets/customer/' . $imagePath : '';
                             $name = optional(Auth::user()->profile)->first_name ?? 'Customer';
                         }
+
+                         $globalUnread = \App\Models\Message::where('is_read', false)
+                                        ->where('sender_id', '!=', auth()->id())
+                                        ->whereHas('conversation.participants', function ($q) {
+                                            $q->where('user_id', auth()->id());
+                                        })
+                                        ->count();
                     @endphp
 
+                    @if($role === 'customer')
+                        <a href="{{ route('cart.index') }}" class="text-gray-700 hover:text-blue-600 font-medium">Cart</a>
+                    @endif
+                    <a href="{{ route('messages.index') }}" class="relative text-gray-700 hover:text-blue-600 font-medium">
+                        Messages
+                        @if($globalUnread > 0)
+                            <span class="absolute -top-1 -right-3 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
+                                {{ $globalUnread }}
+                            </span>
+                        @endif
+                    </a>
                     <!-- Profile Dropdown -->
                     <div x-data="{ open: false }" class="relative">
 

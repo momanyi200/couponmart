@@ -6,7 +6,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="col-span-1 bg-white rounded-lg shadow p-4">
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center justify-between mb-3"> 
                 <h2 class="font-medium">Inbox</h2>
                 <form method="POST" action="{{ route('conversations.admin.start') }}">
                     @csrf
@@ -16,25 +16,60 @@
 
             <ul>
                 @forelse($conversations as $conv)
+                   
                     @php
-                        // get other participant name
-                        $other = $conv->participants->firstWhere('user_id', '<>', auth()->id());
+                        $other = $conv->participants->firstWhere('id', '<>', auth()->id());
                         $latest = $conv->messages->first();
-                        $unreadCount = $conv->messages->where('is_read', false)->where('sender_id', '!=', auth()->id())->count();
+                        $unreadCount = $conv->messages
+                            ->where('is_read', false)
+                            ->where('sender_id', '!=', auth()->id())
+                            ->count();
                     @endphp
+
                     <li class="mb-3">
                         <a href="{{ route('conversations.show', $conv) }}" class="flex items-center p-2 rounded hover:bg-gray-50">
+
                             <div class="flex-1">
-                                <div class="font-medium">{{ $other?->user?->name ?? 'Admin' }} 
+
+                                {{-- OTHER PARTICIPANT NAME --}}
+                                <div class="font-medium">
+                                    {{ $other?->display_name ?? 'Unknown User' }}
+
                                     @if($unreadCount)
-                                        <span class="ml-2 inline-block bg-red-500 text-white text-xs px-2 py-0.5 rounded">{{ $unreadCount }}</span>
+                                        <span class="ml-2 inline-block bg-red-500 text-white text-xs px-2 py-0.5 rounded">
+                                            {{ $unreadCount }}
+                                        </span>
                                     @endif
                                 </div>
-                                <div class="text-sm text-gray-500">{{ $latest?->message ? \Illuminate\Support\Str::limit($latest->message, 60) : 'No messages yet' }}</div>
+
+                                {{-- ORDER INFO --}}
+                                @if($conv->order)
+                                    <div class="text-xs text-gray-600">
+                                        About Order: 
+                                        <span class="font-semibold">
+                                            #{{ $conv->order->order_number ?? $conv->order->id }}
+                                        </span>
+
+                                        @if($conv->order->product)
+                                            – {{ \Illuminate\Support\Str::limit($conv->order->product->title, 40) }}
+                                        @endif
+                                    </div>
+                                @endif
+
+                                {{-- LAST MESSAGE --}}
+                                <div class="text-sm text-gray-500">
+                                    {{ $latest?->message ? \Illuminate\Support\Str::limit($latest->message, 60) : 'No messages yet' }}
+                                </div>
                             </div>
-                            <div class="text-xs text-gray-400">{{ $conv->updated_at->diffForHumans() }}</div>
+
+                            <div class="text-xs text-gray-400">
+                                {{ $conv->updated_at->diffForHumans() }}
+                            </div>
+
                         </a>
                     </li>
+
+
                 @empty
                     <li>No conversations yet.</li>
                 @endforelse

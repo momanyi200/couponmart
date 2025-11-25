@@ -20,4 +20,18 @@ class Conversation extends Model
     {
         return $this->hasMany(Message::class);
     }
+
+    public function unreadMessagesFor($userId)
+    {
+        return $this->messages()
+            ->where('sender_id', '!=', $userId)
+            ->where('is_read', false);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+
 }

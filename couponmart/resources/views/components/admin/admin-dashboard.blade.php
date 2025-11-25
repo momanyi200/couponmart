@@ -4,6 +4,13 @@
     $image = "";
     $name = "admin";
     $user = App\Models\User::find($user_id);
+
+    $globalUnread = \App\Models\Message::where('is_read', false)
+                                        ->where('sender_id', '!=', auth()->id())
+                                        ->whereHas('conversation.participants', function ($q) {
+                                            $q->where('user_id', auth()->id());
+                                        })
+                                        ->count();
 @endphp 
 
 <div class="w-56 p-5 bg-white text-left shadow-md rounded-lg">
@@ -44,8 +51,13 @@
             Orders
         </a>
 
-         <a href="{{ route('messages.index')}}" class="block px-3 py-2 rounded-md hover:bg-gray-100">
+         <a href="{{ route('messages.index')}}" class="relative block px-3 py-2 rounded-md hover:bg-gray-100">
             Messages
+            @if($globalUnread > 0)
+                <span class="absolute -top-1 -right-3 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
+                    {{ $globalUnread }}
+                </span>
+            @endif
         </a>
     </nav>
 

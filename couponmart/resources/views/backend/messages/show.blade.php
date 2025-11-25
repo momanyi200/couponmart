@@ -11,7 +11,7 @@
                 <div class="text-sm text-gray-500">
                     Participants:
                     @foreach($conversation->participants as $p)
-                        {{ $p->user->name ?? $p->name }}@if(!$loop->last),@endif
+                        {{ $p->display_name }}@if(!$loop->last),@endif
                     @endforeach
                 </div>
             </div>

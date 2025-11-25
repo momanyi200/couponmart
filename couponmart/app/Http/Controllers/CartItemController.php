@@ -17,6 +17,9 @@ class CartItemController extends Controller
         $items = CartItem::with('coupon')->where('user_id', auth()->id())->get();
         $total = $items->sum(fn($item) => $item->price * $item->quantity);
 
+        //return public_path();  
+
+
         return view('backend.cart.index', compact('items', 'total'));
     }
 

@@ -4,6 +4,9 @@
 
     @php 
         $role=Auth::user()->getRoleNames()->first();    
+        $user = auth()->user();
+        $isBuyer = $order->user_id == $user->id;
+        $isSeller = $order->seller_id == $user->id;
     @endphp
 
     <div class="max-w-7xl mx-auto px-4 py-6">
@@ -30,6 +33,15 @@
                 class="bg-red-600 text-white px-4 py-2 rounded mt-4 inline-block hover:bg-red-700">
                 Download PDF
             </a>
+            
+
+            @if ($isBuyer || $isSeller)
+                <a href="{{ route('conversations.start', $order->id) }}"
+                class="px-4 py-2 bg-blue-600 text-white rounded">
+                    {{ $isBuyer ? 'Contact Seller' : 'Contact Buyer' }}
+                </a>
+            @endif
+
         </div>
       
 

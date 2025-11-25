@@ -26,9 +26,14 @@ class MessageController extends Controller
             }
         }
 
-        // business users (sellers) cannot chat unless linked to an order
-        if (auth()->user()->hasRole('business') && $conversation->order_id === null) {
-            abort(403);
+
+        // Allow business ↔ admin even without order
+        if (
+            auth()->user()->hasRole('business') &&
+            !$conversation->is_admin_chat && 
+            $conversation->order_id === null
+        ) {
+            abort(403, 'Business cannot start non-order chats with buyers.');
         }
 
 

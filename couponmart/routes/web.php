@@ -191,22 +191,27 @@ Route::middleware(['auth', 'role:admin|business|customer'])->group(function () {
     Route::post('/wallet/deposit', [WalletController::class, 'deposit'])->name('wallet.deposit');
     Route::post('/wallet/withdraw', [WalletController::class, 'withdraw'])->name('wallet.withdraw');
 
-    Route::get('/messages', [App\Http\Controllers\ConversationController::class, 'index'])->name('messages.index');
+    Route::get('/messages', [ConversationController::class, 'index'])->name('messages.index');
     Route::get('/conversations/{conversation}', [App\Http\Controllers\ConversationController::class, 'show'])
         ->middleware('can:access,conversation')
         ->name('conversations.show');
 
-    Route::post('/conversations/{conversation}/messages', [App\Http\Controllers\MessageController::class, 'store'])
+    Route::post('/conversations/{conversation}/messages', [MessageController::class, 'store'])
         ->middleware('can:access,conversation')
         ->name('conversations.messages.store');
 
     // Start admin conversation (user -> admin)
-    Route::post('/conversations/admin/start', [App\Http\Controllers\ConversationController::class, 'startAdminConversation'])
+    Route::post('/conversations/admin/start', [ConversationController::class, 'startAdminConversation'])
         ->name('conversations.admin.start');
 
     // Optional: create conversation for an order (if you create it on order placement in code, no route needed)
-    Route::post('/orders/{order}/conversation', [App\Http\Controllers\ConversationController::class, 'createForOrder'])
+    Route::post('/orders/{order}/conversation', [ConversationController::class, 'createForOrder'])
         ->name('conversations.createForOrder');
+
+    Route::get('/conversations/start/{order}', [ConversationController::class, 'start'])
+        ->name('conversations.start');
+        
+    
 
     
 

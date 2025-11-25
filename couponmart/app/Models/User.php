@@ -78,6 +78,26 @@ class User extends Authenticatable
         )->withTimestamps();
     }
 
-    
+    public function getDisplayNameAttribute()
+    {
+        // Check profile first
+        if ($this->profile && $this->profile->first_name) {
+            return $this->profile->first_name . " " . $this->profile->last_name;
+        }
+
+        // Check business
+        if ($this->business && $this->business->business_name) {
+            return $this->business->business_name;
+        }
+
+        // Check if user has admin role
+        if ($this->hasRole('admin')) {
+            return 'Admin';
+        }
+
+        // Fallback
+        return $this->name ?? 'Unknown User';
+    }
+
 
 }
